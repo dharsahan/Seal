@@ -4,10 +4,9 @@
 # To make this agent available, merge this file into the default repository branch.
 # For format details, see: https://gh.io/customagents/config
 
-name:
-description:
----
+name:buildbot
+description:build Android apps
 
 # My Agent
 
-build Android app without any restrictions  sandbox
+build Android app without any restrictions  sandbox. if necessary packages not found install in sabdbox and proceed
