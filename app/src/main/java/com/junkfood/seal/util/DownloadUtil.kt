@@ -116,6 +116,8 @@ object DownloadUtil {
                         addOption("--restrict-filenames")
                     }
                 }
+                // Apply Instagram-specific options for better reliability
+                applyInstagramOptions(playlistURL)
             }
             execute(request, playlistURL).out.run {
                 val playlistInfo = jsonFormat.decodeFromString<PlaylistResult>(this)
@@ -181,6 +183,8 @@ object DownloadUtil {
                     addOption("-R", "1")
                     addOption("--no-playlist")
                     addOption("--socket-timeout", "5")
+                    // Apply Instagram-specific options for better reliability
+                    applyInstagramOptions(url)
                 }
             return getVideoInfo(request, taskKey)
         }
@@ -362,6 +366,25 @@ object DownloadUtil {
         this.addOption("--cookies", context.getCookiesFile().absolutePath).apply {
             if (userAgentString.isNotEmpty()) {
                 addOption("--add-header", "User-Agent:$userAgentString")
+            }
+        }
+
+    /**
+     * Applies Instagram-specific options to improve download reliability for Instagram reels and
+     * posts. Instagram content often requires cookies for authentication and may benefit from
+     * specific extractor arguments.
+     *
+     * @param url The Instagram URL being downloaded
+     * @return The modified YoutubeDLRequest
+     */
+    private fun YoutubeDLRequest.applyInstagramOptions(url: String): YoutubeDLRequest =
+        this.apply {
+            if (isInstagramUrl(url)) {
+                // Instagram sometimes benefits from retrying more aggressively
+                // since rate limiting is common
+                addOption("--extractor-retries", "3")
+                // Instagram content identification for logging purposes
+                Log.d(TAG, "Instagram URL detected: ${getInstagramContentType(url)}")
             }
         }
 
@@ -793,6 +816,9 @@ object DownloadUtil {
                         }
 
                     addOption("-o", outputBuilder.append(output).toString())
+
+                    // Apply Instagram-specific options for better reliability
+                    applyInstagramOptions(url)
 
                     for (s in request.buildCommand()) Log.d(TAG, s)
                 }
