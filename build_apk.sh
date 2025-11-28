@@ -10,6 +10,7 @@ BUILD_TOOLS_VERSION="34.0.0"
 # Install necessary system packages
 echo "Installing necessary system packages..."
 sudo apt-get update
+sudo apt-get install -y wget unzip openjdk-21-jdk zip
 sudo apt-get install -y wget unzip openjdk-21-jdk
 
 # Setup Android SDK
@@ -36,4 +37,17 @@ sdkmanager "platforms;$PLATFORM_VERSION" "build-tools;$BUILD_TOOLS_VERSION"
 echo "Building APK..."
 ./gradlew assembleDebug
 
+# Zip APKs
+echo "Zipping APKs..."
+OUTPUT_ZIP="seal_apks.zip"
+if [ -f "$OUTPUT_ZIP" ]; then
+    rm "$OUTPUT_ZIP"
+fi
+
+# Determine location of APKs - zipping the entire debug folder structure
+# We go into the folder to zip relative paths or just zip full paths
+zip -r "$OUTPUT_ZIP" app/build/outputs/apk/
+
+echo "Build complete."
+echo "APKs are zipped in: $OUTPUT_ZIP"
 echo "Build complete. APKs are located in app/build/outputs/apk/"
