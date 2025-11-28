@@ -109,6 +109,21 @@ fun Number?.toBitrateText(): String {
 fun getErrorReport(th: Throwable, url: String): String =
     App.getVersionReport() + "\nURL: ${url}\n${th.message}"
 
+/**
+ * Checks if the error message indicates that login/authentication is required.
+ * This detects common patterns from yt-dlp errors that suggest the user needs to provide cookies.
+ */
+fun isLoginRequired(errorMessage: String?): Boolean {
+    if (errorMessage.isNullOrEmpty()) return false
+    val lowerCaseMessage = errorMessage.lowercase()
+    return lowerCaseMessage.contains("login required") ||
+        lowerCaseMessage.contains("login page") ||
+        lowerCaseMessage.contains("provide account credentials") ||
+        lowerCaseMessage.contains("sign in") ||
+        lowerCaseMessage.contains("use --cookies") ||
+        lowerCaseMessage.contains("authentication required")
+}
+
 @Deprecated(
     "Use findURLsFromString instead",
     ReplaceWith("findURLsFromString(s, !isMatchingMultiLink).joinToString(separator = \"\\n\")"),
