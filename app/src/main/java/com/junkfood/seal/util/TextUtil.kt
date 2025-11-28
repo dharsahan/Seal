@@ -159,6 +159,14 @@ fun connectWithBlank(s1: String, s2: String): String {
     return s1 + blank + s2
 }
 
+/** Pre-compiled patterns for Instagram URL detection */
+private object InstagramPatterns {
+    val instagramUrlPattern: Pattern = Pattern.compile(INSTAGRAM_URL_REGEX_PATTERN)
+    val instagramReelPattern: Pattern = Pattern.compile(INSTAGRAM_REEL_REGEX_PATTERN)
+    val instagramPostPattern: Pattern = Pattern.compile(INSTAGRAM_POST_REGEX_PATTERN)
+    val instagramStoryPattern: Pattern = Pattern.compile(INSTAGRAM_STORY_REGEX_PATTERN)
+}
+
 /**
  * Checks if the given URL is an Instagram URL
  *
@@ -166,8 +174,7 @@ fun connectWithBlank(s1: String, s2: String): String {
  * @return true if the URL is from Instagram, false otherwise
  */
 fun isInstagramUrl(url: String): Boolean {
-    val pattern = Pattern.compile(INSTAGRAM_URL_REGEX_PATTERN)
-    return pattern.matcher(url).matches()
+    return InstagramPatterns.instagramUrlPattern.matcher(url).find()
 }
 
 /**
@@ -177,8 +184,7 @@ fun isInstagramUrl(url: String): Boolean {
  * @return true if the URL is an Instagram Reel, false otherwise
  */
 fun isInstagramReelUrl(url: String): Boolean {
-    val pattern = Pattern.compile(INSTAGRAM_REEL_REGEX_PATTERN)
-    return pattern.matcher(url).find()
+    return InstagramPatterns.instagramReelPattern.matcher(url).find()
 }
 
 /**
@@ -188,8 +194,7 @@ fun isInstagramReelUrl(url: String): Boolean {
  * @return true if the URL is an Instagram Post, false otherwise
  */
 fun isInstagramPostUrl(url: String): Boolean {
-    val pattern = Pattern.compile(INSTAGRAM_POST_REGEX_PATTERN)
-    return pattern.matcher(url).find()
+    return InstagramPatterns.instagramPostPattern.matcher(url).find()
 }
 
 /**
@@ -199,15 +204,15 @@ fun isInstagramPostUrl(url: String): Boolean {
  * @return true if the URL is an Instagram Story, false otherwise
  */
 fun isInstagramStoryUrl(url: String): Boolean {
-    val pattern = Pattern.compile(INSTAGRAM_STORY_REGEX_PATTERN)
-    return pattern.matcher(url).find()
+    return InstagramPatterns.instagramStoryPattern.matcher(url).find()
 }
 
 /**
  * Determines the type of Instagram content from the URL
  *
  * @param url The URL to analyze
- * @return A string describing the Instagram content type: "reel", "post", "story", or "other"
+ * @return A string describing the Instagram content type: "reel", "post", "story", "other" for
+ *   other Instagram URLs, or empty string for non-Instagram URLs
  */
 fun getInstagramContentType(url: String): String {
     return when {

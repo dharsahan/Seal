@@ -85,7 +85,7 @@ class InstagramUrlTest {
             assertFalse("Should not match reel as post: $url", isInstagramPostUrl(url))
         }
         instagramStoryUrls.forEach { url ->
-            assertFalse("Should not match story as post: $url", isInstagramStoryUrl(url))
+            assertFalse("Should not match story as post: $url", isInstagramPostUrl(url))
         }
     }
 
