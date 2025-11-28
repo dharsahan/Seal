@@ -72,6 +72,22 @@ fun String.isNumberInRange(start: Int, end: Int): Boolean {
 private const val URL_REGEX_PATTERN =
     "(http|https)://[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-.,@?^=%&:/~+#]*[\\w\\-@?^=%&/~+#])?"
 
+/** Regex pattern for Instagram Reels URLs */
+private const val INSTAGRAM_REEL_REGEX_PATTERN =
+    "(http|https)://(www\\.)?instagram\\.com/(reel|reels)/[A-Za-z0-9_-]+"
+
+/** Regex pattern for Instagram Post URLs */
+private const val INSTAGRAM_POST_REGEX_PATTERN =
+    "(http|https)://(www\\.)?instagram\\.com/p/[A-Za-z0-9_-]+"
+
+/** Regex pattern for Instagram Story URLs */
+private const val INSTAGRAM_STORY_REGEX_PATTERN =
+    "(http|https)://(www\\.)?instagram\\.com/stories/[A-Za-z0-9._]+/[0-9]+"
+
+/** Regex pattern for any Instagram URL */
+private const val INSTAGRAM_URL_REGEX_PATTERN =
+    "(http|https)://(www\\.)?instagram\\.com/.*"
+
 fun String.isNumberInRange(range: IntRange): Boolean = this.isNumberInRange(range.first, range.last)
 
 fun ClosedFloatingPointRange<Float>.toIntRange() =
@@ -141,4 +157,64 @@ fun connectWithDelimiter(vararg strings: String?, delimiter: String): String =
 fun connectWithBlank(s1: String, s2: String): String {
     val blank = if (s1.isEmpty() || s2.isEmpty()) "" else " "
     return s1 + blank + s2
+}
+
+/**
+ * Checks if the given URL is an Instagram URL
+ *
+ * @param url The URL to check
+ * @return true if the URL is from Instagram, false otherwise
+ */
+fun isInstagramUrl(url: String): Boolean {
+    val pattern = Pattern.compile(INSTAGRAM_URL_REGEX_PATTERN)
+    return pattern.matcher(url).matches()
+}
+
+/**
+ * Checks if the given URL is an Instagram Reel URL
+ *
+ * @param url The URL to check
+ * @return true if the URL is an Instagram Reel, false otherwise
+ */
+fun isInstagramReelUrl(url: String): Boolean {
+    val pattern = Pattern.compile(INSTAGRAM_REEL_REGEX_PATTERN)
+    return pattern.matcher(url).find()
+}
+
+/**
+ * Checks if the given URL is an Instagram Post URL
+ *
+ * @param url The URL to check
+ * @return true if the URL is an Instagram Post, false otherwise
+ */
+fun isInstagramPostUrl(url: String): Boolean {
+    val pattern = Pattern.compile(INSTAGRAM_POST_REGEX_PATTERN)
+    return pattern.matcher(url).find()
+}
+
+/**
+ * Checks if the given URL is an Instagram Story URL
+ *
+ * @param url The URL to check
+ * @return true if the URL is an Instagram Story, false otherwise
+ */
+fun isInstagramStoryUrl(url: String): Boolean {
+    val pattern = Pattern.compile(INSTAGRAM_STORY_REGEX_PATTERN)
+    return pattern.matcher(url).find()
+}
+
+/**
+ * Determines the type of Instagram content from the URL
+ *
+ * @param url The URL to analyze
+ * @return A string describing the Instagram content type: "reel", "post", "story", or "other"
+ */
+fun getInstagramContentType(url: String): String {
+    return when {
+        isInstagramReelUrl(url) -> "reel"
+        isInstagramPostUrl(url) -> "post"
+        isInstagramStoryUrl(url) -> "story"
+        isInstagramUrl(url) -> "other"
+        else -> ""
+    }
 }
