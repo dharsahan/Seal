@@ -11,6 +11,7 @@ BUILD_TOOLS_VERSION="34.0.0"
 echo "Installing necessary system packages..."
 sudo apt-get update
 sudo apt-get install -y wget unzip openjdk-21-jdk zip
+sudo apt-get install -y wget unzip openjdk-21-jdk
 
 # Setup Android SDK
 if [ ! -d "$ANDROID_SDK_ROOT" ]; then
@@ -49,3 +50,4 @@ zip -r "$OUTPUT_ZIP" app/build/outputs/apk/
 
 echo "Build complete."
 echo "APKs are zipped in: $OUTPUT_ZIP"
+echo "Build complete. APKs are located in app/build/outputs/apk/"
