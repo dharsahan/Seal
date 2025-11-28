@@ -150,6 +150,9 @@ fun AppEntry(dialogViewModel: DownloadDialogViewModel) {
                             view.slightHapticFeedback()
                             scope.launch { drawerState.open() }
                         },
+                        onNavigateToCookieProfilePage = {
+                            navController.navigate(Route.COOKIE_PROFILE) { launchSingleTop = true }
+                        },
                     )
                 }
                 animatedComposable(Route.DOWNLOADS) { VideoListPage { onNavigateBack() } }

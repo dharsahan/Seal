@@ -190,6 +190,8 @@ sealed interface UiAction {
     data object Resume : UiAction
 
     data class CopyErrorReport(val throwable: Throwable) : UiAction
+
+    data class SetupCookies(val url: String) : UiAction
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -197,6 +199,7 @@ sealed interface UiAction {
 fun DownloadPageV2(
     modifier: Modifier = Modifier,
     onMenuOpen: (() -> Unit) = {},
+    onNavigateToCookieProfilePage: () -> Unit = {},
     dialogViewModel: DownloadDialogViewModel,
     downloader: DownloaderV2 = koinInject(),
 ) {
@@ -246,6 +249,9 @@ fun DownloadPageV2(
                 FileUtil.createIntentForSharingFile(action.filePath)?.let {
                     context.startActivity(Intent.createChooser(it, shareTitle))
                 }
+            }
+            is UiAction.SetupCookies -> {
+                onNavigateToCookieProfilePage()
             }
         }
     }

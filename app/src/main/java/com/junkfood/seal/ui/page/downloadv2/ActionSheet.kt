@@ -18,6 +18,7 @@ import androidx.compose.material.icons.automirrored.outlined.TextSnippet
 import androidx.compose.material.icons.outlined.AudioFile
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.ContentCopy
+import androidx.compose.material.icons.outlined.Cookie
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.FileDownload
@@ -69,6 +70,7 @@ import com.junkfood.seal.ui.page.downloadv2.configure.PreferencesMock
 import com.junkfood.seal.ui.theme.ErrorTonalPalettes
 import com.junkfood.seal.ui.theme.SealTheme
 import com.junkfood.seal.util.Format
+import com.junkfood.seal.util.isLoginRequired
 import com.junkfood.seal.util.toBitrateText
 import com.junkfood.seal.util.toDurationText
 import com.junkfood.seal.util.toFileSizeText
@@ -120,6 +122,18 @@ private fun ErrorReportButton(modifier: Modifier = Modifier, onClick: () -> Unit
         contentColor = ErrorTonalPalettes.accent1(10.0),
         imageVector = Icons.Outlined.ErrorOutline,
         text = stringResource(R.string.copy_error_report),
+        onClick = onClick,
+    )
+}
+
+@Composable
+private fun SetupCookiesButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
+    ActionSheetPrimaryButton(
+        modifier = modifier,
+        containerColor = LocalFixedColorRoles.current.primaryFixed,
+        contentColor = LocalFixedColorRoles.current.onPrimaryFixedVariant,
+        imageVector = Icons.Outlined.Cookie,
+        text = stringResource(R.string.setup_cookies),
         onClick = onClick,
     )
 }
@@ -302,10 +316,19 @@ fun LazyListScope.ActionButtons(
             }
         }
         is Error -> {
+            val showSetupCookies = isLoginRequired(downloadState.throwable.message)
             item(key = "ResumeButton") {
                 ResumeButton(modifier = Modifier.animateItem()) {
                     onActionPost(task, UiAction.Resume)
                     onDismissRequest()
+                }
+            }
+            if (showSetupCookies) {
+                item(key = "SetupCookiesButton") {
+                    SetupCookiesButton(modifier = Modifier.animateItem()) {
+                        onActionPost(task, UiAction.SetupCookies(task.url))
+                        onDismissRequest()
+                    }
                 }
             }
             item(key = "ErrorReportButton") {

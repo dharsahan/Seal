@@ -119,6 +119,7 @@ import com.junkfood.seal.util.PreferenceUtil
 import com.junkfood.seal.util.PreferenceUtil.getBoolean
 import com.junkfood.seal.util.PreferenceUtil.updateBoolean
 import com.junkfood.seal.util.ToastUtil
+import com.junkfood.seal.util.isLoginRequired
 import com.junkfood.seal.util.matchUrlFromClipboard
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -264,6 +265,7 @@ fun DownloadPage(
             navigateToSettings = navigateToSettings,
             navigateToDownloads = navigateToDownloads,
             onNavigateToTaskList = onNavigateToTaskList,
+            onNavigateToCookieGeneratorPage = onNavigateToCookieGeneratorPage,
             processCount = processCount,
             showVideoCard = showVideoCard,
             showOutput = showOutput,
@@ -351,6 +353,7 @@ fun DownloadPageImpl(
     navigateToSettings: () -> Unit = {},
     navigateToDownloads: () -> Unit = {},
     onNavigateToTaskList: () -> Unit = {},
+    onNavigateToCookieGeneratorPage: (String) -> Unit = {},
     pasteCallback: () -> Unit = {},
     cancelCallback: () -> Unit = {},
     onVideoCardClicked: () -> Unit = {},
@@ -526,7 +529,14 @@ fun DownloadPageImpl(
                     }
                 }
                 AnimatedVisibility(visible = errorState != Downloader.ErrorState.None) {
-                    ErrorMessage(title = errorState.title, errorReport = errorState.report) {
+                    ErrorMessage(
+                        title = errorState.title,
+                        errorReport = errorState.report,
+                        onSetupCookiesClicked = {
+                            view.slightHapticFeedback()
+                            onNavigateToCookieGeneratorPage(errorState.url)
+                        },
+                    ) {
                         view.longPressHapticFeedback()
                         clipboardManager.setText(
                             AnnotatedString(
@@ -654,9 +664,11 @@ fun ErrorMessage(
     modifier: Modifier = Modifier,
     title: String,
     errorReport: String,
+    onSetupCookiesClicked: (() -> Unit)? = null,
     onButtonClicked: () -> Unit = {},
 ) {
     val view = LocalView.current
+    val showLoginSuggestion = isLoginRequired(errorReport)
     Surface(
         color = MaterialTheme.colorScheme.errorContainer,
         shape = MaterialTheme.shapes.large,
@@ -687,6 +699,16 @@ fun ErrorMessage(
                 }
             }
 
+            if (showLoginSuggestion) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = stringResource(id = R.string.login_required_suggestion),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                )
+            }
+
             Spacer(modifier = Modifier.height(12.dp))
 
             var isExpanded by remember { mutableStateOf(false) }
@@ -713,6 +735,17 @@ fun ErrorMessage(
             Spacer(modifier = Modifier.height(8.dp))
 
             Row(modifier = Modifier.align(Alignment.End)) {
+                if (showLoginSuggestion && onSetupCookiesClicked != null) {
+                    TextButton(
+                        onClick = onSetupCookiesClicked,
+                        colors =
+                            ButtonDefaults.textButtonColors(
+                                contentColor = MaterialTheme.colorScheme.primary
+                            ),
+                    ) {
+                        Text(text = stringResource(id = R.string.setup_cookies))
+                    }
+                }
                 TextButton(
                     onClick = onButtonClicked,
                     colors =
